@@ -1,4 +1,5 @@
 using Application;
+using Application.Common.models;
 using CQRS_EC_MV;
 using CQRS_EC_MV.Endpoints;
 using CQRS_EC_MV.Swagger;

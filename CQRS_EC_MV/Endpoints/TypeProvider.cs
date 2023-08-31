@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#nullable disable
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
@@ -6,12 +7,12 @@ namespace CQRS_EC_MV.Endpoints;
 
 public static class TypeProvider
 {
-     private static bool IsRecord(this Type objectType)
+    private static bool IsRecord(this Type objectType)
     {
         return objectType.GetMethod("<Clone>$") != null ||
-               ((TypeInfo)objectType)
-               .DeclaredProperties.FirstOrDefault(x => x.Name == "EqualityContract")?
-               .GetMethod?.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
+            ((TypeInfo) objectType)
+            .DeclaredProperties.FirstOrDefault(x => x.Name == "EqualityContract")?
+            .GetMethod?.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
     }
 
     public static Type GetTypeFromAnyReferencingAssembly(string typeName)
@@ -29,7 +30,7 @@ public static class TypeProvider
             .FirstOrDefault();
     }
 
-    public static Type? GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName)
+    public static Type GetFirstMatchingTypeFromCurrentDomainAssembly(string typeName)
     {
         var result = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
@@ -38,10 +39,10 @@ public static class TypeProvider
         return result;
     }
 
-    public static IReadOnlyList<Assembly> GetReferencedAssemblies(Assembly? rootAssembly)
+    public static IReadOnlyList<Assembly> GetReferencedAssemblies(Assembly rootAssembly)
     {
         var visited = new HashSet<string>();
-        var queue = new Queue<Assembly?>();
+        var queue = new Queue<Assembly>();
         var listResult = new List<Assembly>();
 
         var root = rootAssembly ?? Assembly.GetEntryAssembly();
@@ -74,6 +75,7 @@ public static class TypeProvider
     public static IReadOnlyList<Assembly> GetApplicationPartAssemblies(Assembly rootAssembly)
     {
         var rootNamespace = rootAssembly.GetName().Name!.Split('.').First();
+
         var list = rootAssembly!.GetCustomAttributes<ApplicationPartAttribute>()
             .Where(x => x.AssemblyName.StartsWith(rootNamespace, StringComparison.InvariantCulture))
             .Select(name => Assembly.Load(name.AssemblyName))

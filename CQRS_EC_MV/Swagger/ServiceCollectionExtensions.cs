@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#nullable disable
+using System.Reflection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -13,11 +14,15 @@ public static class ServiceCollectionExtensions
 
     // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/master/README.md
     // https://github.com/dotnet/aspnet-api-versioning/tree/88323136a97a59fcee24517a514c1a445530c7e2/examples/AspNetCore/WebApi/MinimalOpenApiExample
-    public static IServiceCollection AddCustomSwagger(this IServiceCollection services,
+    public static IServiceCollection AddCustomSwagger
+    (
+        this IServiceCollection services,
         IConfiguration configuration,
-        params Assembly[] assemblies)
+        params Assembly[] assemblies
+    )
     {
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
         services.AddOptions<SwaggerOptions>().Bind(configuration.GetSection(nameof(SwaggerOptions)))
             .ValidateDataAnnotations();
 
@@ -30,7 +35,8 @@ public static class ServiceCollectionExtensions
                 {
                     var xmlFile = XmlCommentsFilePath(assembly);
 
-                    if (File.Exists(xmlFile)) options.IncludeXmlComments(xmlFile);
+                    if (File.Exists(xmlFile))
+                        options.IncludeXmlComments(xmlFile);
                 }
 
                 options.AddEnumsWithValuesFixFilters();
@@ -40,7 +46,11 @@ public static class ServiceCollectionExtensions
                     {
                         new OpenApiSecurityScheme
                         {
-                            Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"},
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
                             Scheme = "oauth2",
                             Name = "Bearer",
                             In = ParameterLocation.Header
@@ -65,7 +75,8 @@ public static class ServiceCollectionExtensions
         {
             var basePath = Path.GetDirectoryName(assembly.Location);
             var fileName = assembly.GetName().Name + ".xml";
-            return Path.Combine(basePath, fileName);
+
+            return Path.Combine(basePath ?? throw new InvalidOperationException(), fileName);
         }
 
         return services;
@@ -74,6 +85,7 @@ public static class ServiceCollectionExtensions
     public static IApplicationBuilder UseCustomSwagger(this WebApplication app)
     {
         app.UseSwagger();
+
         app.UseSwaggerUI(
             options =>
             {

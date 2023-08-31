@@ -56,8 +56,12 @@ namespace CQRS_EC_MV.Swagger
                 if (parameter.Schema.Default == null && description.DefaultValue != null)
                 {
                     // REF: https://github.com/Microsoft/aspnet-api-versioning/issues/429#issuecomment-605402330
-                    var json = JsonConvert.SerializeObject(description.DefaultValue, description.ModelMetadata
-                        .ModelType, new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+                    var json = JsonConvert.SerializeObject(description.DefaultValue, description!.ModelMetadata?
+                        .ModelType, new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    });
+
                     parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
                 }
 
