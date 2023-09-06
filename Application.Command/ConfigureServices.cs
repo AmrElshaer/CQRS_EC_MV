@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Savorboard.CAP.InMemoryMessageQueue;
 
 namespace Application.Command;
 
@@ -52,6 +53,8 @@ public static class ConfigureServices
                 options.ConnectionString = connectionString;
                 options.Schema = "outbox";
             });
+
+            capOptions.UseInMemoryMessageQueue();
 
             capOptions.UseDashboard(dashboardOptions =>
             {
