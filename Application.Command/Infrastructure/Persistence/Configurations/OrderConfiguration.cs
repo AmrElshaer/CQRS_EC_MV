@@ -11,11 +11,15 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Number)
             .HasMaxLength(18);
 
-        builder.HasMany(x => x.OrderItems)
-            .WithOne().HasForeignKey(x => x.OrderId);
-
         builder.HasOne<Customer>()
             .WithMany().HasForeignKey(o => o.CustomerId);
+
+        builder.HasMany(o => o.OrderItems)
+            .WithOne().HasForeignKey(i => i.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(o=>o.OrderItems)
+            .WithOne().HasForeignKey(i=>i.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(o => o.Address)
             .Property(x => x.Latitude)
