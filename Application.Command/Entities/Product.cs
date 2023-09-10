@@ -5,7 +5,15 @@ namespace Application.Command.Entities;
 
 public class Product : BaseEntity
 {
-    public string Name { get; set; } = default!;
+    public string Name { get; init; } = default!;
 
-    public Money Price { get; set; } = default!;
+    public Money Price { get; init; } = default!;
+
+    private Product() { }
+
+    public Product(string name, Money price)
+    {
+        Name = Argument.IsNotNullOrWhiteSpace(name);
+        Price = Argument.IsNotNull(price);
+    }
 }

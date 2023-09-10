@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Command.Entities;
+using Application.Command.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Command.Infrastructure.Persistence;
@@ -17,6 +18,16 @@ public class WriteDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.Entity<Customer>()
+            .HasData(new List<Customer>()
+            {
+                new("amr"),
+                new("fares")
+            });
+
+      
+
         base.OnModelCreating(modelBuilder);
     }
 }
