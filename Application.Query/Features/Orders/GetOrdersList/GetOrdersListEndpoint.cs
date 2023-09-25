@@ -16,6 +16,7 @@ public class GetOrdersListEndpoint : Endpoint<GetOrdersListQuery, List<OrderQuer
     {
         Verbs(Http.GET);
         Routes("/orders");
+        AllowAnonymous();
     }
 
     public override async Task<List<OrderQueryModel>> ExecuteAsync(GetOrdersListQuery req, CancellationToken ct)

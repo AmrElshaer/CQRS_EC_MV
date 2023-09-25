@@ -75,7 +75,7 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
 
         foreach (var integrationEvent in integrationEvents)
         {
-            await _integrationEventPublisher.PublishAsync(nameof(integrationEvent), integrationEvent, cancellationToken: cancellationToken);
+            await _integrationEventPublisher.PublishAsync(integrationEvent.GetType().Name, integrationEvent, cancellationToken: cancellationToken);
         }
     }
 

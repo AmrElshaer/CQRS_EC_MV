@@ -3,6 +3,7 @@ using Application.Query.Common.Models;
 using Application.Query.Infrastructure.Persistance;
 using Application.Shared.Models;
 using FastEndpoints;
+using FastEndpoints.Swagger;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,11 @@ public static class ConfigureServices
     public static IServiceCollection AddApplicationQuery(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMediatR(Assembly.GetExecutingAssembly());
-        services.Configure<MongoDbSettings>((op) => configuration.GetSection(nameof(MongoDbSettings)));
+        services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
         services.AddSingleton<IMongoDbSettings>((sp) => sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
         services.AddSingleton<ReadDbContext>();
         services.AddSingleton<IMongoClient>((sp) => new MongoClient(sp.GetRequiredService<IMongoDbSettings>().ConnectionString));
-        services.Configure<RabbitMqSettings>((op) => configuration.GetSection(nameof(RabbitMqSettings)));
+        services.Configure<RabbitMqSettings>(configuration.GetSection(nameof(RabbitMqSettings)));
 
         services.AddMassTransit(x =>
         {
@@ -39,7 +40,7 @@ public static class ConfigureServices
         });
 
         services.AddFastEndpoints();
-        services.AddSwaggerDocument();
+        services.SwaggerDocument();
 
         return services;
     }

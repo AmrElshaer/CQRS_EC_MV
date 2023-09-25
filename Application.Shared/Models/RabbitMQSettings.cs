@@ -6,8 +6,6 @@ public class RabbitMqSettings
 {
     public string Host { get; init; }
 
-    public string Port { get; init; }
-
     public string UserName { get; init; }
 
     public string Password { get; init; }

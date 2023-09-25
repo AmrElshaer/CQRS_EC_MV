@@ -21,7 +21,7 @@ public class OrderCreatedIntegrationEventHandler : ICapSubscribe, IIntegrationEv
     }
 
     [CapSubscribe(nameof(OrderCreatedIntegrationEvent))]
-    public Task Handle(OrderCreatedIntegrationEvent @event)
+    public async Task Handle(OrderCreatedIntegrationEvent @event, CancellationToken cancellationToken)
     {
         const string sql = @$"
         SELECT 
@@ -39,42 +39,41 @@ public class OrderCreatedIntegrationEventHandler : ICapSubscribe, IIntegrationEv
         WHERE o.Id = @OrderId
     ";
 
-        using (var dbConnection = _db.CreateConnection())
-        {
-            Dictionary<Guid, OrderQueryModel> ordersDictionary = new();
+        using var dbConnection = _db.CreateConnection();
 
-            var orders = dbConnection.Query<OrderQueryModel, OrderItemViewQueryModel, OrderQueryModel>(
-                sql,
-                (order, orderItem) =>
-                {
-                    if (ordersDictionary.TryGetValue(order.Id, out var existOrder))
-                    {
-                        order = existOrder;
-                    }
-                    else
-                    {
-                        ordersDictionary.Add(order.Id, order);
-                    }
+        Dictionary<Guid, OrderQueryModel> ordersDictionary = new();
 
-                    order.OrderItemViewQueryModels.Add(orderItem);
-
-                    return order;
-                },
-                new
-                {
-                    OrderId = @event.OrderId
-                },
-                splitOn: $"{nameof(OrderItemViewQueryModel.ProductName)}"
-            );
-
-            if (!ordersDictionary.TryGetValue(@event.OrderId, out var orderQueryModel))
+        var orders = await dbConnection.QueryAsync<OrderQueryModel, OrderItemViewQueryModel, OrderQueryModel>(
+            sql,
+            (order, orderItem) =>
             {
-                throw new NotFoundException($"Order with id {@event.OrderId} not found");
-            }
+                if (ordersDictionary.TryGetValue(order.Id, out var existOrder))
+                {
+                    order = existOrder;
+                }
+                else
+                {
+                    ordersDictionary.Add(order.Id, order);
+                }
 
-            @event.AddPayload(orderQueryModel);
+                order.OrderItemViewQueryModels.Add(orderItem);
 
-            return _publishEndpoint.Publish(orderQueryModel);
+                return order;
+            },
+            new
+            {
+                OrderId = @event.OrderId
+            },
+            splitOn: $"{nameof(OrderItemViewQueryModel.ProductName)}"
+        );
+
+        if (!ordersDictionary.TryGetValue(@event.OrderId, out var orderQueryModel))
+        {
+            throw new NotFoundException($"Order with id {@event.OrderId} not found");
         }
+
+        @event.AddPayload(orderQueryModel);
+
+        await _publishEndpoint.Publish(orderQueryModel, cancellationToken);
     }
 }

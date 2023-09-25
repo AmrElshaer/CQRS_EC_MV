@@ -15,6 +15,7 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderCommand, Guid>
     {
         Verbs(Http.POST);
         Routes("/orders");
+        AllowAnonymous();
     }
 
     public override async Task<Guid> ExecuteAsync(CreateOrderCommand req, CancellationToken ct)

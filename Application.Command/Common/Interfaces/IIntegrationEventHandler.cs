@@ -5,5 +5,5 @@ namespace Application.Command.Common.Interfaces;
 public interface IIntegrationEventHandler<in TIntegrationEvent>
     where TIntegrationEvent : IntegrationEvent
 {
-    Task Handle(TIntegrationEvent @event);
+    Task Handle(TIntegrationEvent @event, CancellationToken cancellationToken);
 }

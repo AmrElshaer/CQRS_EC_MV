@@ -4,6 +4,7 @@ using Application.Command.Infrastructure.Interceptors;
 using Application.Command.Infrastructure.Persistence;
 using Application.Shared.Models;
 using FastEndpoints;
+using FastEndpoints.Swagger;
 using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public static class ConfigureServices
         services.AddMediatR(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         services.AddScoped<ISaveChangesInterceptor, DispatchEventsInterceptor>();
-        services.Configure<RabbitMqSettings>((op) => configuration.GetSection(nameof(RabbitMqSettings)));
+        services.Configure<RabbitMqSettings>(configuration.GetSection(nameof(RabbitMqSettings)));
 
         services.AddDbContext<WriteDbContext>((sp, options) =>
         {
@@ -64,7 +65,7 @@ public static class ConfigureServices
 
         services.AddSingleton<DapperDbContext>((sp) => new DapperDbContext(connectionString));
         services.AddFastEndpoints();
-        services.AddSwaggerDocument();
+        services.SwaggerDocument();
 
         return services;
     }

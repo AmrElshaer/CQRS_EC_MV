@@ -14,5 +14,18 @@ app.UseFastEndpoints(c =>
     c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
+app.UseAuthorization();
+
 app.UseSwaggerGen();
+
+app.MapWhen(ctx => ctx.Request.Path == "/", builder =>
+{
+    builder.Run(context =>
+    {
+        context.Response.Redirect("/swagger");
+
+        return Task.CompletedTask;
+    });
+});
+
 app.Run();
