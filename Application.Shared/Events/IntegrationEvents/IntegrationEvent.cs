@@ -10,4 +10,8 @@ public abstract class IntegrationEvent<T> : IntegrationEvent
     }
 }
 
-public abstract class IntegrationEvent { }
+public abstract class IntegrationEvent
+{
+    protected Guid Id { get; set; } = Guid.NewGuid();
+    protected DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}

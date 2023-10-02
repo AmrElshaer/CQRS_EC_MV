@@ -69,13 +69,18 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
             return;
         }
 
-        entities.ToList().ForEach(e => e.ClearIntegrationEvents());
+       
 
         _integrationEventPublisher.Transaction.Value = ActivatorUtilities.CreateInstance<SqlServerCapTransaction>(_integrationEventPublisher.ServiceProvider).Begin(transaction);
 
         foreach (var integrationEvent in integrationEvents)
         {
             await _integrationEventPublisher.PublishAsync(integrationEvent.GetType().Name, integrationEvent, cancellationToken: cancellationToken);
+        }
+
+        foreach (var entity in entities)
+        {
+            entity.ClearIntegrationEvents();
         }
     }
 
@@ -93,9 +98,13 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
             .SelectMany(e => e.DomainEvents)
             .ToList();
 
-        entities.ToList().ForEach(e => e.ClearDomainEvents());
 
         foreach (var domainEvent in domainEvents)
             await _mediator.Publish(domainEvent, cancellationToken);
+
+        foreach (var e in entities)
+        {
+            e.ClearDomainEvents();
+        }
     }
 }

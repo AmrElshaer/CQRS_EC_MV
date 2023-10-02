@@ -28,13 +28,14 @@ public class OrderCreatedIntegrationEventHandler : ICapSubscribe, IIntegrationEv
             o.Id AS {nameof(OrderQueryModel.Id)},   
             o.Latitude AS {nameof(OrderQueryModel.Latitude)},
             o.Longitude AS {nameof(OrderQueryModel.Longitude)},
+            o.Number AS {nameof(OrderQueryModel.OrderNumber)},
             c.Name AS {nameof(OrderQueryModel.CustomerName)},
             p.Name AS {nameof(OrderItemViewQueryModel.ProductName)},
-            oi.Quantity AS {nameof(OrderItemViewQueryModel.Quantity)},
-            oi.Price AS {nameof(OrderItemViewQueryModel.Price)},
+            p.Price AS {nameof(OrderItemViewQueryModel.Price)},
+            oi.Quantity AS {nameof(OrderItemViewQueryModel.Quantity)}
         FROM Orders o
         INNER JOIN Customers c ON o.CustomerId = c.Id
-        LEFT JOIN OrderItems oi ON o.Id = oi.OrderId
+        INNER JOIN OrderItem oi ON o.Id = oi.OrderId
         INNER JOIN Products p ON oi.ProductId = p.Id
         WHERE o.Id = @OrderId
     ";

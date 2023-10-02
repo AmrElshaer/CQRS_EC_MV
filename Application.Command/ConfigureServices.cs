@@ -3,6 +3,7 @@ using Application.Command.Common.Behaviours;
 using Application.Command.Infrastructure.Interceptors;
 using Application.Command.Infrastructure.Persistence;
 using Application.Shared.Models;
+using DotNetCore.CAP;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
@@ -49,10 +50,12 @@ public static class ConfigureServices
 
         services.AddCap(capOptions =>
         {
+            capOptions.FailedRetryCount = 2;
             capOptions.UseSqlServer(options =>
             {
                 options.ConnectionString = connectionString;
                 options.Schema = "outbox";
+                
             });
 
             capOptions.UseInMemoryMessageQueue();
@@ -62,7 +65,13 @@ public static class ConfigureServices
                 dashboardOptions.PathMatch = "/cap";
             });
         });
-
+        services.Scan(scan =>
+        {
+            scan.FromAssemblies(typeof(ApplicationCommandRoot).Assembly)
+                .AddClasses(filter => filter.AssignableTo<ICapSubscribe>())
+                .AsSelf()
+                .WithTransientLifetime();
+        });
         services.AddSingleton<DapperDbContext>((sp) => new DapperDbContext(connectionString));
         services.AddFastEndpoints();
         services.SwaggerDocument();
