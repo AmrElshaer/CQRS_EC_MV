@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Application.Command.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,11 +73,25 @@ namespace Application.Command.Migrations
                 {
                     table.PrimaryKey("PK_OrderItem", x => new { x.OrderId, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_OrderItem_Orders_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_OrderItem_Orders_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("2ff016df-267f-4002-b03d-df628cc9d037"), "amr" },
+                    { new Guid("339f9252-d310-492c-bf7f-f2032760a19a"), "fares" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -96,10 +112,10 @@ namespace Application.Command.Migrations
                 name: "OrderItem");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Customers");

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Application.Command.Common.Behaviours;
 

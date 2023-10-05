@@ -13,5 +13,11 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             x.OrderId,
             x.ProductId
         });
+        builder.HasOne<Order>()
+            .WithMany(o=>o.OrderItems)
+            .HasForeignKey(oi => oi.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
+      
+        
     }
 }

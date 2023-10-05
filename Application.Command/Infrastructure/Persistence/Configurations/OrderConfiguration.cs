@@ -14,18 +14,12 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasOne<Customer>()
             .WithMany().HasForeignKey(o => o.CustomerId);
 
-        builder.HasMany(o => o.OrderItems)
-            .WithOne().HasForeignKey(i => i.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.HasMany(o=>o.OrderItems)
-            .WithOne().HasForeignKey(i=>i.ProductId)
-            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.OwnsOne(o => o.Address)
+        builder.OwnsOne(o => o.Location)
             .Property(x => x.Latitude)
             .HasColumnName("Latitude");
 
-        builder.OwnsOne(o => o.Address)
+        builder.OwnsOne(o => o.Location)
             .Property(x => x.Longitude)
             .HasColumnName("Longitude");
     }

@@ -40,12 +40,12 @@ namespace Application.Command.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("db7d17f1-fde5-4674-ba66-4cc189bf1a36"),
+                            Id = new Guid("2ff016df-267f-4002-b03d-df628cc9d037"),
                             Name = "amr"
                         },
                         new
                         {
-                            Id = new Guid("78c98daa-f7fe-41b5-89bd-dcd0e5cced5b"),
+                            Id = new Guid("339f9252-d310-492c-bf7f-f2032760a19a"),
                             Name = "fares"
                         });
                 });
@@ -116,7 +116,7 @@ namespace Application.Command.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Application.Command.ValueObjects.Address", "Address", b1 =>
+                    b.OwnsOne("Application.Command.ValueObjects.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
                                 .HasColumnType("uniqueidentifier");
@@ -137,7 +137,7 @@ namespace Application.Command.Migrations
                                 .HasForeignKey("OrderId");
                         });
 
-                    b.Navigation("Address")
+                    b.Navigation("Location")
                         .IsRequired();
                 });
 
@@ -145,6 +145,12 @@ namespace Application.Command.Migrations
                 {
                     b.HasOne("Application.Command.Entities.Order", null)
                         .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Application.Command.Entities.Product", null)
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Application.Command.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20230906060737_init")]
-    partial class init
+    [Migration("20231005175152_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,18 @@ namespace Application.Command.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2ff016df-267f-4002-b03d-df628cc9d037"),
+                            Name = "amr"
+                        },
+                        new
+                        {
+                            Id = new Guid("339f9252-d310-492c-bf7f-f2032760a19a"),
+                            Name = "fares"
+                        });
                 });
 
             modelBuilder.Entity("Application.Command.Entities.Order", b =>
@@ -107,7 +119,7 @@ namespace Application.Command.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Application.Command.ValueObjects.Address", "Address", b1 =>
+                    b.OwnsOne("Application.Command.ValueObjects.Location", "Location", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
                                 .HasColumnType("uniqueidentifier");
@@ -128,7 +140,7 @@ namespace Application.Command.Migrations
                                 .HasForeignKey("OrderId");
                         });
 
-                    b.Navigation("Address")
+                    b.Navigation("Location")
                         .IsRequired();
                 });
 
@@ -136,6 +148,12 @@ namespace Application.Command.Migrations
                 {
                     b.HasOne("Application.Command.Entities.Order", null)
                         .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Application.Command.Entities.Product", null)
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

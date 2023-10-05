@@ -1,7 +1,7 @@
 ﻿using Application.Command.Common;
 using Application.Command.Common.Enumerations;
 using Application.Command.ValueObjects;
-using Application.Shared.Events.IntegrationEvents.Orders;
+using MassTransit;
 
 namespace Application.Command.Entities;
 
@@ -11,7 +11,7 @@ public class Order : BaseEntity
 
     public OrderStatus Status { get; private set; }
 
-    public Address Address { get; private set; } = default!;
+    public Location Location { get; private set; } = default!;
 
     public Guid CustomerId { get; private set; }
 
@@ -21,23 +21,40 @@ public class Order : BaseEntity
 
     private Order() { }
 
-    public static Order Create(int count, Guid customerId, Address address, IReadOnlyCollection<OrderItem> orderItems)
+    private Order(string number,
+        Guid customerId,
+        Location location
+    )
     {
-        var order = new Order()
+
+        Number = number;
+        CustomerId = customerId;
+        Status = OrderStatus.Created;
+        Location = location;
+
+        // throw event
+    }
+
+    public static Result<Order> Create(
+        int count,
+        Guid customerId,
+        Location location,
+        IReadOnlyCollection<(Guid ProductId,int Quantity)> orderItems)
+    {
+        
+        var number = $"O-{count + 1}";
+        var order=new Order(number, customerId, location);
+        var orderItemsResults = orderItems
+            .Select(x => OrderItem.Create(x.ProductId,order.Id, x.Quantity))
+            .ToList();
+
+        var orderItemRes = orderItemsResults.FirstOrDefault(oi => oi.Failure);
+
+        if (orderItemRes != null)
         {
-            Number = $"O-{count + 1}",
-            CustomerId = customerId,
-            Status = OrderStatus.Created,
-            Address = address
-        };
-
-        order._orderItems.AddRange(Argument.IsNotEmpty(orderItems));
-
-        order.AddIntegrationEvent(new OrderCreatedIntegrationEvent()
-        {
-            OrderId = order.Id
-        });
-
-        return order;
+            return Result.Fail<Order>(orderItemRes.Error);
+        }
+        order._orderItems.AddRange(orderItemsResults.Select(oi=>oi.Value));
+        return Result.Ok(order);
     }
 }

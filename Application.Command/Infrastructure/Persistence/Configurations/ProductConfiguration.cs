@@ -15,6 +15,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .Property(x => x.Amount)
             .HasPrecision(16, 4)
             .HasColumnName("Price");
+        builder.HasMany<OrderItem>()
+            .WithOne()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(x => x.Price)
             .Property(x => x.CurrencyCode)

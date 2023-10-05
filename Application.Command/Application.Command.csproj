@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <Folder Include="Infrastructure\Persistence\Migrations\" />
+        <Folder Include="Migrations\" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.0.151" />

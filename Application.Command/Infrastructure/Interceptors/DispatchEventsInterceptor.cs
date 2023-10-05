@@ -35,7 +35,7 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
 
         try
         {
-            await DispatchDomainEvents(eventData.Context, cancellationToken);
+            await DispatchDomainEvents(eventData.Context, cancellationToken); 
             var res = await base.SavingChangesAsync(eventData, result, cancellationToken);
             await DispatchIntegrationEvents(eventData.Context, transaction, cancellationToken);
             await transaction.CommitAsync(cancellationToken);

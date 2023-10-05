@@ -1,4 +1,6 @@
-﻿namespace Application.Command.Entities;
+﻿using Application.Command.Common;
+
+namespace Application.Command.Entities;
 
 public class OrderItem
 {
@@ -10,9 +12,21 @@ public class OrderItem
 
     private OrderItem() { }
 
-    public OrderItem(Guid productId, int quantity)
+    private  OrderItem(Guid productId,Guid orderId, int quantity)
     {
-        ProductId = Argument.IsNotDefault(productId);
-        Quantity = Argument.IsGreaterThan(quantity, 0);
+        ProductId = productId;
+        Quantity =quantity;
+        OrderId = orderId;
     }
+
+    public static Result<OrderItem>  Create(Guid productId,Guid orderId, int quantity)
+    {
+        if (quantity<=0)
+        {
+            return  Result.Fail<OrderItem>(ValidationException.LessThanOrEqualZero(nameof(quantity)));
+        }
+
+        return Result.Ok(new OrderItem(productId,orderId,quantity));
+    }
+    
 }

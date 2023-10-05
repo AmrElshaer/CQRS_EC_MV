@@ -1,10 +1,13 @@
-﻿using Application.Command.Entities;
+﻿
+using Application.Command.Common;
+using Application.Command.Entities;
 using Application.Command.Infrastructure.Persistence;
 using Application.Command.ValueObjects;
+using MassTransit;
 
 namespace Application.Command.Features.Orders.CreateOrder;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
     private readonly WriteDbContext _db;
 
@@ -13,22 +16,33 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
         _db = db;
     }
 
-    public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
+       
         var count = _db.Orders.Count();
-        var orderItems = request.OrderItems.Select(x => new OrderItem(x.ProductId, x.Quantity)).ToList();
-        var address = Address.Create(request.Latitude, request.Longitude);
+       
+        var locationResult = Location.Create(request.Latitude, request.Longitude);
 
-        var order = Order.Create(
-            count
-            , request.CustomerId,
-            address,
-            orderItems
-        );
+        if (locationResult.Failure)
+        {
+            return Result.Fail<Guid>(locationResult.Error);
+        }
 
-        _db.Orders.Add(order);
+        var orderItems = request.OrderItems
+            .Select(x => (x.ProductId, x.Quantity))
+            .ToList();
+        var order = Order.Create(count, request.CustomerId, locationResult.Value, orderItems);
+
+        if (order.Failure)
+        {
+            return Result.Fail<Guid>(order.Error);
+        }
+        _db.Orders.Add(order.Value);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return order.Id;
+        return Result.Ok(order.Value.Id);
+
+
     }
+
 }
