@@ -12,13 +12,11 @@ public class OrderQueryModel
 
     public double Longitude { get; init; }
 
-    public IList<OrderItemViewQueryModel> OrderItemViewQueryModels { get; init; } = default!;
+    public IList<OrderItemViewQueryModel> OrderItemViewQueryModels { get; init; }= new List<OrderItemViewQueryModel>();
 }
 
 public class OrderItemViewQueryModel
 {
-    public Guid Id { get; init; }
-
     public string ProductName { get; init; } = string.Empty;
 
     public decimal Price { get; init; }

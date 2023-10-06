@@ -25,6 +25,7 @@ public static class ConfigureServices
 
         services.AddMassTransit(x =>
         {
+            x.SetKebabCaseEndpointNameFormatter();
             x.UsingRabbitMq((context, cfg) =>
             {
                 var rabbitMqSettings = context.GetRequiredService<IOptions<RabbitMqSettings>>().Value;
@@ -34,6 +35,7 @@ public static class ConfigureServices
                     h.Username(rabbitMqSettings.UserName);
                     h.Password(rabbitMqSettings.Password);
                 });
+                cfg.ConfigureEndpoints(context);
             });
 
             x.AddConsumers(typeof(ApplicationQueryRoot).Assembly);

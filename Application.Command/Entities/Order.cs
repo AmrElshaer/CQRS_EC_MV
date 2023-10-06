@@ -1,6 +1,7 @@
 ﻿using Application.Command.Common;
 using Application.Command.Common.Enumerations;
 using Application.Command.ValueObjects;
+using Application.Shared.Events.IntegrationEvents.Orders;
 using MassTransit;
 
 namespace Application.Command.Entities;
@@ -31,8 +32,10 @@ public class Order : BaseEntity
         CustomerId = customerId;
         Status = OrderStatus.Created;
         Location = location;
-
-        // throw event
+        AddIntegrationEvent(new OrderCreatedIntegrationEvent()
+        {
+            OrderId = Id
+        });
     }
 
     public static Result<Order> Create(

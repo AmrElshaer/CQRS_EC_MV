@@ -5,4 +5,5 @@ namespace Application.Shared.Events.IntegrationEvents.Orders;
 
 public class OrderCreatedIntegrationEvent : IntegrationEvent<OrderQueryModel>
 {
+    public Guid OrderId { get; init; }
 }
