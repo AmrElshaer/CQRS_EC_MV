@@ -1,11 +1,8 @@
 ﻿#nullable disable
-using System.Data;
 using Application.Command.Common;
 using DotNetCore.CAP;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Command.Infrastructure.Interceptors;
 
@@ -28,29 +25,12 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync
         (DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
-        var database = eventData.Context?.Database;
-        ArgumentNullException.ThrowIfNull(database);
-
-        await using var transaction = database.CurrentTransaction ?? await database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
-
-        try
-        {
-            await DispatchDomainEvents(eventData.Context, cancellationToken); 
-            var res = await base.SavingChangesAsync(eventData, result, cancellationToken);
-            await DispatchIntegrationEvents(eventData.Context, transaction, cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-
-            return res;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-
-            throw;
-        }
+        await DispatchDomainEvents(eventData.Context, cancellationToken);
+        await DispatchIntegrationEvents(eventData.Context, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private async Task DispatchIntegrationEvents(DbContext context, IDbContextTransaction transaction, CancellationToken cancellationToken = default)
+    private async Task DispatchIntegrationEvents(DbContext context, CancellationToken cancellationToken = default)
     {
         if (context == null)
             return;
@@ -68,10 +48,6 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
         {
             return;
         }
-
-       
-
-        _integrationEventPublisher.Transaction.Value = ActivatorUtilities.CreateInstance<SqlServerCapTransaction>(_integrationEventPublisher.ServiceProvider).Begin(transaction);
 
         foreach (var integrationEvent in integrationEvents)
         {
@@ -97,7 +73,6 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
         var domainEvents = entities
             .SelectMany(e => e.DomainEvents)
             .ToList();
-
 
         foreach (var domainEvent in domainEvents)
             await _mediator.Publish(domainEvent, cancellationToken);

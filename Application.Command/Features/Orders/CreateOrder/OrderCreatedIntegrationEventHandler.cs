@@ -44,7 +44,7 @@ public class OrderCreatedIntegrationEventHandler : ICapSubscribe, IIntegrationEv
 
         Dictionary<Guid, OrderQueryModel> ordersDictionary = new();
 
-        var orders = await dbConnection.QueryAsync<OrderQueryModel, OrderItemViewQueryModel, OrderQueryModel>(
+       _ = await dbConnection.QueryAsync<OrderQueryModel, OrderItemViewQueryModel, OrderQueryModel>(
             sql,
             (order, orderItem) =>
             {
