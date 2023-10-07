@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Command.Features.Orders.CreateOrder;
 
-public class CreateOrderEndpoint : Endpoint<CreateOrderCommand, IActionResult>
+public class CreateOrderEndpoint : Endpoint<CreateOrderCommand>
 {
     private readonly IMediator _mediator;
 
@@ -19,13 +19,14 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderCommand, IActionResult>
         AllowAnonymous();
     }
 
-    public override async Task<IActionResult> ExecuteAsync(CreateOrderCommand req, CancellationToken ct)
+    public override async Task HandleAsync(CreateOrderCommand req, CancellationToken ct)
     {
         var res = await _mediator.Send(req, ct);
 
-        return res.Match<IActionResult>(
-            success => new OkObjectResult(success),
-            failure => new BadRequestObjectResult(failure)
-        );
+        if (res.Failure)
+        {
+            ThrowError(res.Error.Message);
+        }
+        await SendAsync( res.Value, cancellation:ct);
     }
 }
