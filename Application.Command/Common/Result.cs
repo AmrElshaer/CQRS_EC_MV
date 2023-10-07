@@ -6,6 +6,7 @@ namespace Application.Command.Common;
 public class Result
 {
     public bool Success { get; private set; }
+
     public Exception Error { get; private set; }
 
     public bool Failure => !Success;
@@ -35,20 +36,7 @@ public class Result
     {
         return new Result<T>(value, true, null);
     }
-
-   
-    public static Result Combine(params Result[] results)
-    {
-        foreach (var result in results)
-        {
-            if (result.Failure)
-                return result;
-        }
-
-        return Ok();
-    }
 }
-
 
 public class Result<T> : Result
 {
@@ -57,7 +45,19 @@ public class Result<T> : Result
     internal protected Result([AllowNull] T value, bool success, Exception error)
         : base(success, error)
     {
-
         Value = value;
     }
+
+    public static implicit operator Result<T>(T value) => Ok(value);
+    public static implicit operator Result<T>(Exception error) => Fail<T>(error);
+
+    public R Match<R>(Func<T, R> succ, Func<Exception, R> fail) =>
+        Failure
+            ? fail(Error)
+            : succ(Value);
+
+    public async Task<R> MatchAsync<R>(Func<T, Task<R>> succ, Func<Exception, R> fail) =>
+        Failure
+            ? fail(Error)
+            : await succ(Value);
 }

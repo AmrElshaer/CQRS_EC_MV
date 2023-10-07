@@ -1,6 +1,4 @@
-﻿using Application.Command.Common;
-using FastEndpoints;
-using Microsoft.AspNetCore.Mvc;
+﻿using FastEndpoints;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Command.Features.Orders.CreateOrder;
@@ -23,13 +21,11 @@ public class CreateOrderEndpoint : Endpoint<CreateOrderCommand, IActionResult>
 
     public override async Task<IActionResult> ExecuteAsync(CreateOrderCommand req, CancellationToken ct)
     {
-        var res= await _mediator.Send(req, ct);
+        var res = await _mediator.Send(req, ct);
 
-        if (res.Failure)
-        {
-            return new BadRequestObjectResult(res.Error.Message);
-        }
-
-        return new OkObjectResult(res.Value);
+        return res.Match<IActionResult>(
+            success => new OkObjectResult(success),
+            failure => new BadRequestObjectResult(failure)
+        );
     }
 }

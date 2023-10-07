@@ -23,10 +23,10 @@ public class OrderItem
     {
         if (quantity<=0)
         {
-            return  Result.Fail<OrderItem>(ValidationException.LessThanOrEqualZero(nameof(quantity)));
+            return  ValidationException.LessThanOrEqualZero(nameof(quantity));
         }
 
-        return Result.Ok(new OrderItem(productId,orderId,quantity));
+        return new OrderItem(productId,orderId,quantity);
     }
     
 }

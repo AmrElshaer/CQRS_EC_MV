@@ -2,7 +2,6 @@
 using Application.Command.Common.Enumerations;
 using Application.Command.ValueObjects;
 using Application.Shared.Events.IntegrationEvents.Orders;
-using MassTransit;
 
 namespace Application.Command.Entities;
 
@@ -55,9 +54,9 @@ public class Order : BaseEntity
 
         if (orderItemRes != null)
         {
-            return Result.Fail<Order>(orderItemRes.Error);
+            return orderItemRes.Error;
         }
         order._orderItems.AddRange(orderItemsResults.Select(oi=>oi.Value));
-        return Result.Ok(order);
+        return order;
     }
 }
