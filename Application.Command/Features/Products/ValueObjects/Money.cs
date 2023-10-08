@@ -1,6 +1,6 @@
 ﻿using Application.Command.Common;
 
-namespace Application.Command.ValueObjects;
+namespace Application.Command.Features.Products.ValueObjects;
 
 public class Money : ValueObject
 {

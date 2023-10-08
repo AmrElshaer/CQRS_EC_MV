@@ -1,9 +1,9 @@
 ﻿using Application.Command.Common;
-using Application.Command.Common.Enumerations;
-using Application.Command.ValueObjects;
+using Application.Command.Features.Orders.Enumerations;
+using Application.Command.Features.Orders.ValueObjects;
 using Application.Shared.Events.IntegrationEvents.Orders;
 
-namespace Application.Command.Entities;
+namespace Application.Command.Features.Orders.Entities;
 
 public class Order : BaseEntity
 {

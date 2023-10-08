@@ -1,7 +1,7 @@
 ﻿using Application.Command.Common;
-using Application.Command.ValueObjects;
+using Application.Command.Features.Products.ValueObjects;
 
-namespace Application.Command.Entities;
+namespace Application.Command.Features.Products.Entities;
 
 public class Product : BaseEntity
 {

@@ -1,6 +1,6 @@
 ﻿using Application.Command.Common;
 
-namespace Application.Command.Entities;
+namespace Application.Command.Features.Customers.Entities;
 
 public class Customer : BaseEntity
 {

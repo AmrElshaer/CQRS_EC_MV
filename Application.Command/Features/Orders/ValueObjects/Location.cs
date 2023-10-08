@@ -1,6 +1,6 @@
 ﻿using Application.Command.Common;
 
-namespace Application.Command.ValueObjects;
+namespace Application.Command.Features.Orders.ValueObjects;
 
 public class Location : ValueObject
 {

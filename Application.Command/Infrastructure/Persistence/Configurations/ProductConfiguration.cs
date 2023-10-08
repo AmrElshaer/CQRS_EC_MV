@@ -1,4 +1,5 @@
-﻿using Application.Command.Entities;
+﻿using Application.Command.Features.Orders.Entities;
+using Application.Command.Features.Products.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

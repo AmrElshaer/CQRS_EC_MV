@@ -1,7 +1,7 @@
 ﻿using Application.Command.Common;
-using Application.Command.Entities;
+using Application.Command.Features.Orders.Entities;
+using Application.Command.Features.Orders.ValueObjects;
 using Application.Command.Infrastructure.Persistence;
-using Application.Command.ValueObjects;
 
 namespace Application.Command.Features.Orders.CreateOrder;
 
