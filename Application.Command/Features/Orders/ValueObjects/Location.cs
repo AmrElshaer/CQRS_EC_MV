@@ -29,7 +29,7 @@ public class Location : ValueObject
         return new Location(latitude, longitude);
     }
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return Latitude;
         yield return Longitude;

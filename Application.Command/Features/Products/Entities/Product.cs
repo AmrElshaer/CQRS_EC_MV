@@ -3,7 +3,7 @@ using Application.Command.Features.Products.ValueObjects;
 
 namespace Application.Command.Features.Products.Entities;
 
-public class Product : BaseEntity
+public class Product : Aggregate<ProductId>
 {
     public string Name { get; init; } = default!;
 

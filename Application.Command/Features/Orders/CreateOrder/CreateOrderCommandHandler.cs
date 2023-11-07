@@ -1,7 +1,10 @@
 ﻿using Application.Command.Common;
+using Application.Command.Features.Customers.Entities;
 using Application.Command.Features.Orders.Entities;
 using Application.Command.Features.Orders.ValueObjects;
+using Application.Command.Features.Products.Entities;
 using Application.Command.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Command.Features.Orders.CreateOrder;
 
@@ -26,10 +29,13 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         }
 
         var orderItems = request.OrderItems
-            .Select(x => (x.ProductId, x.Quantity))
+            .Select(x => (ProductId.From(x.ProductId), x.Quantity))
             .ToList();
 
-        var orderRes = Order.Create(count, request.CustomerId, locationResult.Value, orderItems);
+        var orderId = OrderId.From(Guid.NewGuid());
+        var customerId = CustomerId.From(request.CustomerId);
+
+        var orderRes = Order.Create(count, orderId, customerId, locationResult.Value, orderItems);
 
         if (orderRes.Failure)
         {
@@ -39,6 +45,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
         _db.Orders.Add(orderRes.Value);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return orderRes.Value.Id;
+        return orderRes.Value.Id.Value;
     }
 }

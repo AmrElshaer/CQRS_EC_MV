@@ -27,6 +27,7 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
     {
         await DispatchDomainEvents(eventData.Context, cancellationToken);
         await DispatchIntegrationEvents(eventData.Context, cancellationToken);
+
         return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
@@ -36,7 +37,7 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
             return;
 
         var entities = context.ChangeTracker
-            .Entries<BaseEntity>()
+            .Entries<IHasIntegrationEvents>()
             .Where(e => e.Entity.IntegrationEvents.Any())
             .Select(e => e.Entity);
 
@@ -66,7 +67,7 @@ public class DispatchEventsInterceptor : SaveChangesInterceptor
             return;
 
         var entities = context.ChangeTracker
-            .Entries<BaseEntity>()
+            .Entries<IHasDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Any())
             .Select(e => e.Entity);
 

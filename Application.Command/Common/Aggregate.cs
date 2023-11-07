@@ -1,12 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Application.Shared.Events.IntegrationEvents;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Command.Common;
 
-public abstract class BaseEntity
+public abstract class Aggregate<TId>:Entity<TId>,IHasIntegrationEvents ,IHasDomainEvents where TId : EntityId
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    protected Aggregate(TId id) : base(id)
+    {
+        
+    }
 
+    protected Aggregate()
+    {
+        
+    }
     private readonly List<DomainEvent> _domainEvents = new();
     private readonly List<IntegrationEvent> _integrationEvents = new();
 
@@ -21,10 +29,7 @@ public abstract class BaseEntity
         _domainEvents.Add(domainEvent);
     }
 
-    public void RemoveDomainEvent(DomainEvent domainEvent)
-    {
-        _domainEvents.Remove(domainEvent);
-    }
+  
 
     public void ClearDomainEvents()
     {
@@ -36,10 +41,7 @@ public abstract class BaseEntity
         _integrationEvents.Add(integrationEvent);
     }
 
-    public void RemoveIntegrationEvent(IntegrationEvent integrationEvent)
-    {
-        _integrationEvents.Remove(integrationEvent);
-    }
+   
 
     public void ClearIntegrationEvents()
     {

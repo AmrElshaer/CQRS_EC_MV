@@ -23,11 +23,9 @@ public class WriteDbContext : DbContext
         modelBuilder.Entity<Customer>()
             .HasData(new List<Customer>()
             {
-                new("amr"),
-                new("fares")
+                new(CustomerId.From(Guid.NewGuid()), "amr"),
+                new(CustomerId.From(Guid.NewGuid()), "fares")
             });
-
-      
 
         base.OnModelCreating(modelBuilder);
     }

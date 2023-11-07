@@ -32,4 +32,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Shared\Application.Shared.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Migrations\20231106202405_ChangeIdToStrongleId.cs" />
+      <Compile Remove="Migrations\20231106202405_ChangeIdToStrongleId.Designer.cs" />
+    </ItemGroup>
 </Project>

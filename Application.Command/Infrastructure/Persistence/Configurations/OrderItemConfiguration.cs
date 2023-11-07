@@ -13,11 +13,15 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             x.OrderId,
             x.ProductId
         });
+
+        builder.Property(oi => oi.ProductId)
+            .HasConversion<ProductConfiguration.ProductIdConverter>();
+
+        builder.Property(oi => oi.OrderId)
+            .HasConversion<OrderIdConverter>();
+
         builder.HasOne<Order>()
-            .WithMany(o=>o.OrderItems)
-            .HasForeignKey(oi => oi.OrderId)
-            .OnDelete(DeleteBehavior.NoAction);
-      
-        
+            .WithMany(o => o.OrderItems)
+            .HasForeignKey(oi => oi.OrderId);
     }
 }
